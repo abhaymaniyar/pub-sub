@@ -1,0 +1,3 @@
+{"level":"info","message":"logger construction succeeded","foo":"bar"}
+{"level":"info","message":"failed to fetch URL","foo":"bar"}
+{"level":"error","message":"Created consumer...","foo":"bar"}

@@ -22,6 +22,8 @@ type ConsumerObject struct {
 
 //Init will initialize the consumer function
 func (cons *ConsumerObject) Init(broker string, group string) {
+	logger.Init("./logConsumer", 1, 1, 2, false)
+	fmt.Println("aslkdfalskf")
 	var err error
 	C, err = kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":     broker,

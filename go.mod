@@ -10,5 +10,6 @@ require (
 	github.com/jaswanth05rongali/pub-sub v0.0.0-20200522183037-b4a7091079ba
 	github.com/rs/zerolog v1.18.0
 	github.com/spf13/viper v1.7.0
+	go.uber.org/zap v1.15.0
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.4.2
 )
