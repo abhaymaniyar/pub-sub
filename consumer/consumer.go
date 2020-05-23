@@ -1,48 +1,21 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"pub-sub/worker"
 
 	"github.com/jaswanth05rongali/pub-sub/client"
 	"github.com/jaswanth05rongali/pub-sub/config"
-	"github.com/jaswanth05rongali/pub-sub/worker"
 	"go.uber.org/zap"
 
 	"github.com/spf13/viper"
 )
 
 var consumer *worker.ConsumerObject
-var logger *zap.Logger
 var err error
+var logger *zap.Logger
 
 func main() {
-	rawJSON := []byte(`{
-		"level": "debug",
-		"encoding": "json",
-		"outputPaths": ["stdout", "./logConsumer/log"],
-		"errorOutputPaths": ["stderr"],
-		"initialFields": {"foo": "bar"},
-		"encoderConfig": {
-		  "messageKey": "message",
-		  "levelKey": "level",
-		  "levelEncoder": "lowercase"
-		}
-	  }`)
-
-	var cfg zap.Config
-	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
-		panic(err)
-	}
-	logger, err = cfg.Build()
-	if err != nil {
-		panic(err)
-	}
-	defer logger.Sync()
-
-	logger.Info("logger construction succeeded")
-	defer logger.Sync()
-	logger.Info("failed to fetch URL")
 	config.Init(false)
 	broker := viper.GetString("broker")
 	group := viper.GetString("group")
@@ -50,8 +23,9 @@ func main() {
 
 	client := client.Object{}
 	consumer = &worker.ConsumerObject{ClientInterface: client}
-	logger.Error("Created consumer...")
 	consumer.Init(broker, group)
+	logger = consumer.GetLogger()
+	logger.Error("Created consumer...")
 
 	err = consumer.GetConsumer().Subscribe(topics, nil)
 	if err != nil {
@@ -60,8 +34,4 @@ func main() {
 	}
 	// logger.Info("Successfully subscribed to topic:%v", topics)
 	consumer.Consume(false)
-}
-
-func GetLogger() *zap.Logger {
-	return logger
 }

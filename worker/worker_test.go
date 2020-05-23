@@ -5,13 +5,14 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/jaswanth05rongali/pub-sub/mocks"
+	"go.uber.org/zap"
 )
 
 func TestInit(t *testing.T) {
 	var c *ConsumerObject
 	broker := "localhost:19092"
 	group := "testGroup"
-	c.Init(broker, group)
+	c.Init(broker, group, &zap.Logger{})
 	switch c.GetConsumer().String() {
 	case "rdkafka#consumer-1":
 		if broker == "localhost:19092" {

@@ -1,19 +1,21 @@
 package worker
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
+	"pub-sub/client"
 	"syscall"
 
-	"github.com/antigloss/go/logger"
-	"github.com/jaswanth05rongali/pub-sub/client"
+	"go.uber.org/zap"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 // C stores the created producer instance
 var C *kafka.Consumer
+var logger *zap.Logger
 
 //ConsumerObject defines a struct for entire consumer along with few methodsC
 type ConsumerObject struct {
@@ -22,8 +24,8 @@ type ConsumerObject struct {
 
 //Init will initialize the consumer function
 func (cons *ConsumerObject) Init(broker string, group string) {
-	logger.Init("./logConsumer", 1, 1, 2, false)
-	fmt.Println("aslkdfalskf")
+	logger = createLogger()
+	logger.Info("Inside worker >>>>>>>> ")
 	var err error
 	C, err = kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":     broker,
@@ -39,7 +41,7 @@ func (cons *ConsumerObject) Init(broker string, group string) {
 	}
 
 	fmt.Printf("Created Consumer %v\n", C)
-	logger.Info("Hello world")
+	logger.Info("Hello world >>>>>>>>>> ")
 }
 
 //GetConsumer returns the consumer variable
@@ -103,4 +105,33 @@ func (cons *ConsumerObject) Consume(testCall bool) {
 
 	fmt.Printf("Closing consumer\n")
 	C.Close()
+}
+
+func (cons *ConsumerObject) GetLogger() *zap.Logger {
+	return logger
+}
+
+func createLogger() *zap.Logger {
+	rawJSON := []byte(`{
+		"level": "debug",
+		"encoding": "json",
+		"outputPaths": ["stdout", "./logConsumer/log"],
+		"errorOutputPaths": ["stderr"],
+		"encoderConfig": {
+		  "messageKey": "message",
+		  "levelKey": "level",
+		  "levelEncoder": "lowercase"
+		}
+	  }`)
+
+	var cfg zap.Config
+	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
+		panic(err)
+	}
+	logger, err := cfg.Build()
+	if err != nil {
+		panic(err)
+	}
+	defer logger.Sync()
+	return logger
 }
