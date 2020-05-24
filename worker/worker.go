@@ -15,7 +15,7 @@ import (
 
 // C stores the created producer instance
 var C *kafka.Consumer
-var logger *zap.Logger
+var logger *zap.SugaredLogger
 
 //ConsumerObject defines a struct for entire consumer along with few methodsC
 type ConsumerObject struct {
@@ -107,11 +107,11 @@ func (cons *ConsumerObject) Consume(testCall bool) {
 	C.Close()
 }
 
-func (cons *ConsumerObject) GetLogger() *zap.Logger {
+func (cons *ConsumerObject) GetLogger() *zap.SugaredLogger {
 	return logger
 }
 
-func createLogger() *zap.Logger {
+func createLogger() *zap.SugaredLogger {
 	rawJSON := []byte(`{
 		"level": "debug",
 		"encoding": "json",
@@ -132,6 +132,9 @@ func createLogger() *zap.Logger {
 	if err != nil {
 		panic(err)
 	}
+	loggerone := zap.NewExample()
+	sugarone := loggerone.Sugar()
+	sugarone.Infof("Hello")
 	defer logger.Sync()
-	return logger
+	return sugarone
 }

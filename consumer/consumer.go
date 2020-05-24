@@ -13,7 +13,7 @@ import (
 
 var consumer *worker.ConsumerObject
 var err error
-var logger *zap.Logger
+var logger *zap.SugaredLogger
 
 func main() {
 	config.Init(false)
@@ -32,6 +32,6 @@ func main() {
 		fmt.Printf("Error:%v while subscribing to topic:%v", err, topics)
 		// logger.Info("Error:%v while subscribing to topic:%v", zap.String(err), topics)
 	}
-	// logger.Info("Successfully subscribed to topic:%v", topics)
+	logger.Infof("Successfully subscribed to topic:%v", topics)
 	consumer.Consume(false)
 }
